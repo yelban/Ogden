@@ -1,4 +1,5 @@
 import { setLearned } from './progress';
+import { type CheerLevel, playCheer, playCorrect, playWrong } from './sfx';
 import { speak } from './speech';
 
 interface WordLite {
@@ -55,6 +56,40 @@ let flipped = false;
 let mode: 'flip' | 'quiz-en-to-zh' | 'quiz-zh-to-en' = 'flip';
 let autoSpeak = true;
 let shuffled = false;
+let sfxOn = true;
+let autoAdvance = true;
+let advanceTimer: ReturnType<typeof setTimeout> | null = null;
+let streak = 0;
+
+function cancelAdvance(): void {
+  if (advanceTimer !== null) {
+    clearTimeout(advanceTimer);
+    advanceTimer = null;
+  }
+}
+
+function cheerLevelFor(n: number): CheerLevel | null {
+  if (n === 5) return 'small';
+  if (n === 10) return 'medium';
+  if (n === 20) return 'big';
+  if (n > 20 && n % 10 === 0) return 'big';
+  return null;
+}
+
+function showStreakToast(n: number): void {
+  const overlay = document.getElementById('practice-overlay');
+  if (!overlay) return;
+  overlay.querySelectorAll('.streak-toast').forEach((t) => t.remove());
+  const t = document.createElement('div');
+  t.className = 'streak-toast';
+  t.innerHTML = `<span class="num">${n}</span>連勝`;
+  overlay.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 300);
+  }, 1800);
+}
 
 function pickFiltered(): WordLite[] {
   // Respect the page's current category filter + search via :not([hidden]) ancestor
@@ -64,24 +99,74 @@ function pickFiltered(): WordLite[] {
   });
 }
 
-function start(newMode: typeof mode): void {
+function syncModeActive(): void {
+  const map: Record<typeof mode, string> = {
+    'flip': 'mode-flip',
+    'quiz-en-to-zh': 'mode-quiz-en-zh',
+    'quiz-zh-to-en': 'mode-quiz-zh-en',
+  };
+  const activeId = map[mode];
+  document.querySelectorAll<HTMLButtonElement>('.bar .mode').forEach((b) => {
+    b.classList.toggle('active', b.id === activeId);
+  });
+}
+
+function start(newMode: typeof mode, startId?: string): void {
   mode = newMode;
+  cancelAdvance();
   if (!pool.length) pool = readPool();
   const filtered = pickFiltered();
   order = shuffled ? shuffle(filtered) : filtered;
   cursor = 0;
   flipped = false;
+  activeOptions = [];
+  answered = false;
+  streak = 0;
   if (!order.length) {
     alert('沒有符合篩選的卡片可以練習。');
     return;
   }
+  if (startId) {
+    let idx = order.findIndex((w) => w.id === startId);
+    if (idx < 0) {
+      const w = pool.find((p) => p.id === startId);
+      if (w) {
+        order = [w];
+        idx = 0;
+      }
+    }
+    if (idx >= 0) cursor = idx;
+  }
+  syncModeActive();
   render();
   document.body.dataset.practice = 'on';
+}
+
+function switchMode(newMode: typeof mode): void {
+  if (!order.length) {
+    start(newMode);
+    return;
+  }
+  mode = newMode;
+  cancelAdvance();
+  flipped = false;
+  activeOptions = [];
+  answered = false;
+  streak = 0;
+  syncModeActive();
+  render();
+}
+
+export function startPracticeAt(id: string): void {
+  start('flip', id);
 }
 
 function close(): void {
   delete document.body.dataset.practice;
   speechSynthesis.cancel();
+  cancelAdvance();
+  streak = 0;
+  document.querySelectorAll('#practice-overlay .streak-toast').forEach((t) => t.remove());
 }
 
 function current(): WordLite | undefined {
@@ -89,18 +174,19 @@ function current(): WordLite | undefined {
 }
 
 function next(): void {
+  cancelAdvance();
   if (cursor < order.length - 1) {
     cursor++;
     flipped = false;
     render();
   } else {
-    // wrap to end summary
     cursor = 0;
     flipped = false;
     render();
   }
 }
 function prev(): void {
+  cancelAdvance();
   if (cursor > 0) {
     cursor--;
     flipped = false;
@@ -127,7 +213,11 @@ function speakBtn(text: string, label: string): string {
   return `<button class="speak-inline" data-speak-text="${escAttr(text)}" aria-label="${label}" title="${label}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></button>`;
 }
 
+const CHEVRON_LEFT = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
+const CHEVRON_RIGHT = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
+
 function renderFlip(w: WordLite): string {
+  const prevDisabled = cursor === 0;
   return `
     <div class="card-face ${flipped ? 'back' : 'front'}">
       <div class="counter">${cursor + 1} / ${order.length}</div>
@@ -155,6 +245,8 @@ function renderFlip(w: WordLite): string {
             </div>
           </div>`
         : `<button class="reveal-btn" id="reveal">查看釋義</button>`}
+      <button class="card-nav prev" id="prev-fab" type="button" aria-label="上一個"${prevDisabled ? ' disabled' : ''}>${CHEVRON_LEFT}</button>
+      <button class="card-nav next" id="next-fab" type="button" aria-label="下一個">${CHEVRON_RIGHT}</button>
     </div>
   `;
 }
@@ -180,6 +272,7 @@ function renderQuiz(w: WordLite): string {
           .join('')}
       </div>
       ${answered ? `<p class="hint">按 Enter 或 → 下一題</p>` : ''}
+      ${answered ? `<button class="card-nav next" id="next-fab" type="button" aria-label="下一題">${CHEVRON_RIGHT}</button>` : ''}
     </div>
   `;
 }
@@ -211,16 +304,39 @@ function render(): void {
       if (text) void speak(text);
     });
   });
+  root.querySelector<HTMLButtonElement>('#next-fab')?.addEventListener('click', () => next());
+  root.querySelector<HTMLButtonElement>('#prev-fab')?.addEventListener('click', () => prev());
 }
 
 function onQuizPick(btn: HTMLButtonElement): void {
   if (answered) return;
   answered = true;
   const correct = btn.dataset.correct === 'true';
+  let delay = 0;
   if (correct) {
     setLearned(current()!.id, true);
+    streak++;
+    if (sfxOn) playCorrect();
+    const cheer = cheerLevelFor(streak);
+    if (cheer) {
+      if (sfxOn) setTimeout(() => playCheer(cheer), 320);
+      showStreakToast(streak);
+      delay = 2200;
+    } else {
+      delay = 1200;
+    }
+  } else {
+    streak = 0;
+    if (sfxOn) playWrong();
   }
   render();
+  if (correct && autoAdvance) {
+    cancelAdvance();
+    advanceTimer = setTimeout(() => {
+      advanceTimer = null;
+      next();
+    }, delay);
+  }
 }
 
 function onKey(ev: KeyboardEvent): void {
@@ -259,17 +375,33 @@ export function initPractice(): void {
   document.addEventListener('keydown', onKey);
   document.getElementById('open-practice')?.addEventListener('click', () => start('flip'));
   document.getElementById('close-practice')?.addEventListener('click', close);
-  document.getElementById('mode-flip')?.addEventListener('click', () => start('flip'));
-  document.getElementById('mode-quiz-en-zh')?.addEventListener('click', () => start('quiz-en-to-zh'));
-  document.getElementById('mode-quiz-zh-en')?.addEventListener('click', () => start('quiz-zh-to-en'));
+  document.getElementById('mode-flip')?.addEventListener('click', () => switchMode('flip'));
+  document.getElementById('mode-quiz-en-zh')?.addEventListener('click', () => switchMode('quiz-en-to-zh'));
+  document.getElementById('mode-quiz-zh-en')?.addEventListener('click', () => switchMode('quiz-zh-to-en'));
+
+  document.getElementById('practice-overlay')?.addEventListener('click', (ev) => {
+    if (mode !== 'flip') return;
+    const t = ev.target as HTMLElement;
+    if (t.closest('.bar') || t.closest('.card-face')) return;
+    close();
+  });
 
   const shuffleEl = document.getElementById('practice-shuffle') as HTMLInputElement | null;
   const autoEl = document.getElementById('practice-auto-speak') as HTMLInputElement | null;
+  const sfxEl = document.getElementById('practice-sfx') as HTMLInputElement | null;
   shuffleEl?.addEventListener('change', () => {
     shuffled = shuffleEl.checked;
     start(mode);
   });
   autoEl?.addEventListener('change', () => {
     autoSpeak = autoEl.checked;
+  });
+  sfxEl?.addEventListener('change', () => {
+    sfxOn = sfxEl.checked;
+  });
+  const advEl = document.getElementById('practice-auto-advance') as HTMLInputElement | null;
+  advEl?.addEventListener('change', () => {
+    autoAdvance = advEl.checked;
+    if (!autoAdvance) cancelAdvance();
   });
 }

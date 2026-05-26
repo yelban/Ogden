@@ -1,4 +1,4 @@
-import { initPractice } from './practice';
+import { initPractice, startPracticeAt } from './practice';
 import { isLearned, subscribe, toggle, TOTAL_WORDS } from './progress';
 import { getLang, setLang, speak } from './speech';
 
@@ -42,6 +42,41 @@ for (const c of cards) {
         if (text) void speak(text);
       }
     });
+  });
+}
+
+// ---------- card → practice entry ----------
+const synLookup = new Map<string, string>();
+for (const c of cards) {
+  const id = c.dataset.wordId ?? '';
+  const uk = (c.dataset.headword ?? '').toLowerCase();
+  const us = (c.dataset.spellingUs ?? '').toLowerCase();
+  if (uk) synLookup.set(uk, id);
+  if (us && us !== uk) synLookup.set(us, id);
+}
+
+for (const c of cards) {
+  const id = c.dataset.wordId ?? '';
+  const zone = c.querySelector<HTMLElement>('.practice-zone');
+  zone?.addEventListener('click', () => startPracticeAt(id));
+  zone?.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' || ev.key === ' ') {
+      ev.preventDefault();
+      startPracticeAt(id);
+    }
+  });
+
+  c.querySelectorAll<HTMLButtonElement>('.syn').forEach((s) => {
+    const term = (s.dataset.syn ?? '').toLowerCase();
+    const hit = synLookup.get(term);
+    if (hit) {
+      s.disabled = false;
+      s.dataset.active = 'true';
+      s.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        startPracticeAt(hit);
+      });
+    }
   });
 }
 

@@ -14,6 +14,12 @@
     <label class="opt">
       <input type="checkbox" id="practice-auto-speak" checked /> 自動發音
     </label>
+    <label class="opt">
+      <input type="checkbox" id="practice-sfx" checked /> 音效
+    </label>
+    <label class="opt">
+      <input type="checkbox" id="practice-auto-advance" checked /> 自動推進
+    </label>
     <button id="close-practice" class="close" type="button" aria-label="關閉練習">✕</button>
   </div>
 
@@ -92,6 +98,7 @@
   }
 
   :global(.card-face) {
+    position: relative;
     max-width: 720px;
     width: 100%;
     background: var(--bg-elev);
@@ -116,10 +123,10 @@
     letter-spacing: -0.02em;
     line-height: 1.1;
     margin: 16px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
+    text-align: center;
+  }
+  :global(.big-word > span) {
+    vertical-align: middle;
   }
   :global(.big-zh) {
     font-family: var(--zh-serif);
@@ -215,12 +222,69 @@
     color: var(--op);
     border-color: var(--op);
   }
-  /* big-word still uses flex for centering — keep its inline button slightly larger */
   :global(.big-word .speak-inline) {
     width: 32px;
     height: 32px;
-    margin-left: 0;
+    margin-left: 14px;
+    font-size: 1em;
     vertical-align: middle;
+    transform: translateY(0.12em);
+  }
+
+  :global(.card-nav) {
+    position: absolute;
+    bottom: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: var(--ink-faint);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 50%;
+    transition: color 0.15s, background 0.15s;
+  }
+  :global(.card-nav.prev) { left: 12px; }
+  :global(.card-nav.next) { right: 12px; }
+  :global(.card-nav:hover) {
+    color: var(--op);
+    background: var(--op-bg);
+  }
+  :global(.card-nav:disabled) {
+    opacity: 0.25;
+    cursor: not-allowed;
+    background: transparent;
+  }
+
+  :global(.streak-toast) {
+    position: fixed;
+    top: 96px;
+    left: 50%;
+    transform: translate(-50%, -8px);
+    background: var(--op);
+    color: #fff;
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 12px 22px;
+    border-radius: 999px;
+    box-shadow: 0 10px 28px -10px color-mix(in srgb, var(--ink) 50%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 110;
+  }
+  :global(.streak-toast.show) {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  :global(.streak-toast .num) {
+    font-size: 22px;
+    margin-right: 4px;
   }
 
   :global(.quiz-options) {
