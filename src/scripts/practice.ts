@@ -137,17 +137,21 @@ function renderFlip(w: WordLite): string {
       </div>
       ${flipped
         ? `<div class="reveal">
-            <p class="en-def">
-              <span>${escHtml(w.definition_en)}</span>
-              ${speakBtn(w.definition_en, '聽英文釋義')}
-            </p>
-            <p class="zh-gloss">${escHtml(w.gloss_zh_tw)}</p>
             <div class="ex-block">
+              <div class="block-label">例句 · Example</div>
               <p class="ex-en">
                 <span>${escHtml(w.example_en)}</span>
                 ${speakBtn(w.example_en, '聽例句')}
               </p>
               <p class="ex-zh">${escHtml(w.example_zh_tw)}</p>
+            </div>
+            <div class="def-block">
+              <div class="block-label">釋義 · Definition</div>
+              <p class="en-def">
+                <span>${escHtml(w.definition_en)}</span>
+                ${speakBtn(w.definition_en, '聽英文釋義')}
+              </p>
+              <p class="zh-gloss">${escHtml(w.gloss_zh_tw)}</p>
             </div>
           </div>`
         : `<button class="reveal-btn" id="reveal">查看釋義</button>`}

@@ -163,11 +163,24 @@
     line-height: 1.65;
     margin-bottom: 8px;
   }
-  :global(.reveal .ex-block) {
-    padding-top: 14px;
-    border-top: 1px dashed var(--line);
+  :global(.reveal .ex-block),
+  :global(.reveal .def-block) {
     display: grid;
     gap: 6px;
+  }
+  :global(.reveal .def-block) {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--line);
+  }
+  :global(.reveal .block-label) {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 2px;
   }
   :global(.reveal .ex-en) {
     font-family: var(--serif);
