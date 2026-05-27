@@ -15,9 +15,9 @@ export const CATEGORY_META: Record<
   Category,
   { label_en: string; label_zh: string; expected: number }
 > = {
-  operations: { label_en: 'Operations', label_zh: '功能詞', expected: 100 },
-  general_things: { label_en: 'General Things', label_zh: '一般名詞', expected: 400 },
-  picturable_things: { label_en: 'Picturable Things', label_zh: '具象名詞', expected: 200 },
+  operations: { label_en: 'Operations', label_zh: '語法骨架詞', expected: 100 },
+  general_things: { label_en: 'General Things', label_zh: '抽象名詞', expected: 400 },
+  picturable_things: { label_en: 'Picturable Things', label_zh: '具體名詞', expected: 200 },
   qualities_general: { label_en: 'Qualities', label_zh: '形容詞', expected: 100 },
   qualities_opposites: { label_en: 'Opposites', label_zh: '反義詞', expected: 50 },
 };

@@ -49,21 +49,21 @@ const svg = `<?xml version="1.0" encoding="UTF-8"?>
       <text x="100" y="38" text-anchor="middle" font-family="Inter, sans-serif"
             font-size="13" font-weight="600" fill="#fb923c" letter-spacing="2">OPERATIONS</text>
       <text x="100" y="60" text-anchor="middle" font-family="Noto Serif TC, serif"
-            font-size="20" fill="#fde68a">功能詞 · 100</text>
+            font-size="18" fill="#fde68a">語法骨架詞 · 100</text>
     </g>
     <g transform="translate(208,0)">
       <rect width="200" height="80" rx="10" fill="#0d2926" stroke="#5eead4" stroke-width="2"/>
       <text x="100" y="38" text-anchor="middle" font-family="Inter, sans-serif"
             font-size="13" font-weight="600" fill="#5eead4" letter-spacing="2">GENERAL</text>
       <text x="100" y="60" text-anchor="middle" font-family="Noto Serif TC, serif"
-            font-size="20" fill="#a7f3d0">一般名詞 · 400</text>
+            font-size="20" fill="#a7f3d0">抽象名詞 · 400</text>
     </g>
     <g transform="translate(416,0)">
       <rect width="200" height="80" rx="10" fill="#2d2410" stroke="#fbbf24" stroke-width="2"/>
       <text x="100" y="38" text-anchor="middle" font-family="Inter, sans-serif"
             font-size="13" font-weight="600" fill="#fbbf24" letter-spacing="2">PICTURABLE</text>
       <text x="100" y="60" text-anchor="middle" font-family="Noto Serif TC, serif"
-            font-size="20" fill="#fde68a">具象名詞 · 200</text>
+            font-size="20" fill="#fde68a">具體名詞 · 200</text>
     </g>
     <g transform="translate(624,0)">
       <rect width="200" height="80" rx="10" fill="#1e1d3a" stroke="#a5b4fc" stroke-width="2"/>

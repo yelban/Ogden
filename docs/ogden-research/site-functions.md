@@ -122,13 +122,19 @@ UK 英式 / US 美式
 
 | Ogden 英文 | ogden.munch.love 簡中 | 本站繁中（最終）|
 |---|---|---|
-| Operations | 操作词 | **功能詞** |
-| General Things | 通用词 | **一般名詞** |
-| Picturable Things | 图示词 | **具象名詞** |
+| Operations | 操作词 | **語法骨架詞** |
+| General Things | 通用词 | **抽象名詞** |
+| Picturable Things | 图示词 | **具體名詞** |
 | Qualities | 性质词 | **形容詞** |
 | Opposites | 反义对 | **反義詞** |
 
-避開的選詞理由：「操作詞 / 圖示詞 / 性質詞 / 反義對」都是字面直譯、在台灣中小學英語不通用；「通用詞」中文不順。改用「功能詞 / 一般名詞 / 具象名詞 / 形容詞 / 反義詞」，台灣國中英語師生看到立刻懂。詳細記錄在 `src/data/schema.ts` 的 `CATEGORY_META`。
+選詞理由：
+- **Operations → 語法骨架詞**：原意是「讓句子運作的語法操作」，100 字中只有 18 個動詞 operators，其餘是介系詞、代詞、限定詞、連接詞、副詞等虛詞。「功能詞」雖是語言學標準術語但對一般讀者抽象、「操作詞」字面直譯不順，「語法骨架詞」貼合 Ogden 的「讓句子轉起來的膠水」意象，對台灣讀者直覺
+- **General Things → 抽象名詞**：對照 Picturable 的「具體」軸，明示這 400 字是抽象事物（act, attention, attempt, cause, change...）
+- **Picturable Things → 具體名詞**：與「抽象」配對，呼應 Ogden 原意「能畫出來的東西」
+- **Qualities / Opposites → 形容詞 / 反義詞**：台灣國中英語教科書慣用語
+
+詳細記錄在 `src/data/schema.ts` 的 `CATEGORY_META`。
 
 ## 10. 給繁中版的取捨建議
 

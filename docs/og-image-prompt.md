@@ -47,8 +47,8 @@ where the middle word "Basic" is in italic and in vibrant orange (#fb923c). Belo
 that, a Traditional Chinese subtitle "850 字繁中學習手冊" in slightly smaller
 serif, off-white. In the lower half: five horizontal pill-shaped category swatches
 in a row, each with a colored outline and small CJK + Romaji labels:
-"功能詞 OPERATIONS · 100" (orange), "一般名詞 GENERAL · 400" (teal),
-"具象名詞 PICTURABLE · 200" (amber), "形容詞 QUALITIES · 100" (indigo),
+"語法骨架詞 OPERATIONS · 100" (orange), "抽象名詞 GENERAL · 400" (teal),
+"具體名詞 PICTURABLE · 200" (amber), "形容詞 QUALITIES · 100" (indigo),
 "反義詞 OPPOSITES · 50" (purple). Bottom-left footer: "ogden.orz99.com" in small
 light-grey sans-serif. Editorial, vintage-meets-modern, museum-catalog aesthetic.
 Clean typography, lots of negative space, no decorative clutter. Photographic
