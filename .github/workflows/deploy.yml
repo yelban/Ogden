@@ -46,4 +46,13 @@ jobs:
         run: bun run build
 
       - name: Deploy to Cloudflare Pages
-        run: bunx wrangler pages deploy dist --project-name=ogden --branch=main --commit-hash=${{ github.sha }}
+        env:
+          # Cloudflare deployments API rejects non-ASCII commit messages
+          # (error 8000111). Force a plain-ASCII message tied to the SHA.
+          CF_COMMIT_MESSAGE: "deploy ${{ github.sha }}"
+        run: |
+          bunx wrangler pages deploy dist \
+            --project-name=ogden \
+            --branch=main \
+            --commit-hash=${{ github.sha }} \
+            --commit-message="$CF_COMMIT_MESSAGE"
