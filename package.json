@@ -12,7 +12,8 @@
     "validate": "bun run scripts/validate-data.ts",
     "generate": "bun run scripts/generate-content.ts",
     "merge-reviewed": "bun run scripts/merge-reviewed.ts",
-    "og-image": "bun run scripts/build-og-image.ts"
+    "og-image": "bun run scripts/build-og-image.ts",
+    "favicon": "bun run scripts/build-favicon.ts"
   },
   "dependencies": {
     "astro": "^5.0.0",
