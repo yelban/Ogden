@@ -7,7 +7,7 @@
 
 C.K. Ogden 1930 年 Basic English 850 字的繁體中文版（台灣用語）學習網站。
 
-**線上版**：https://ogden.orz99.com
+🌐 **線上版**：https://ogden.orz99.com · ✈️ **PWA 可離線使用**
 
 ---
 
